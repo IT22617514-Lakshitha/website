@@ -1,8 +1,42 @@
 "use client";
 
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { useState } from "react";
+import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function Contact() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus("idle");
+    
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    try {
+      const res = await fetch("https://formsubmit.co/ajax/ratrlakshitha@gmail.com", {
+        method: "POST",
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (res.ok) {
+        setStatus("success");
+        form.reset();
+      } else {
+        setStatus("error");
+      }
+    } catch (error) {
+      setStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="py-24 bg-[#050B14] text-white border-t border-slate-800">
       <div className="container mx-auto px-6 md:px-12">
@@ -50,18 +84,31 @@ export default function Contact() {
           <div className="md:w-1/2">
             <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-xl">
               <h4 className="text-2xl font-bold mb-6">Send a Message</h4>
-              <form className="space-y-4" onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const name = (form.elements.namedItem("name") as HTMLInputElement).value;
-                const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-                const message = (form.elements.namedItem("message") as HTMLTextAreaElement).value;
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <input type="hidden" name="_subject" value="New submission from SDN Portfolio!" />
+                <input type="hidden" name="_template" value="table" />
+                <input type="hidden" name="_captcha" value="false" />
                 
-                const subject = encodeURIComponent(`Message from ${name || 'Website Visitor'}`);
-                const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+                {status === "success" && (
+                  <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-lg flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Message sent successfully!</p>
+                      <p className="text-sm opacity-80">We'll get back to you soon.</p>
+                    </div>
+                  </div>
+                )}
                 
-                window.location.href = `mailto:ratrlakshitha@gmail.com?subject=${subject}&body=${body}`;
-              }}>
+                {status === "error" && (
+                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Failed to send message</p>
+                      <p className="text-sm opacity-80">Please try again later or contact us directly.</p>
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-slate-400 mb-1">Your Name</label>
                   <input 
@@ -71,6 +118,7 @@ export default function Contact() {
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
                     placeholder="John Doe"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -82,6 +130,7 @@ export default function Contact() {
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
                     placeholder="john@example.com"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -93,11 +142,16 @@ export default function Contact() {
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow resize-none"
                     placeholder="How can we help you?"
                     required
+                    disabled={isSubmitting}
                   ></textarea>
                 </div>
-                <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-colors">
-                  <span>Send Message</span>
-                  <Send className="w-4 h-4" />
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
+                  {!isSubmitting && <Send className="w-4 h-4" />}
                 </button>
               </form>
             </div>
