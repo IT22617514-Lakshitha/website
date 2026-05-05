@@ -5,14 +5,14 @@ import { FileText, Download, ExternalLink } from "lucide-react";
 
 export default function Documents() {
   const docs = [
-    { title: "Project Charter", type: "Document", icon: <FileText />, download: true },
-    { title: "Proposal Document", type: "Document", icon: <FileText />, download: true },
-    { title: "Check List Documents", type: "Checklist", icon: <FileText />, download: true },
-    { title: "Final Documentation", type: "Document", icon: <FileText />, download: true },
-    { title: "Proposal Slides", type: "Presentation", icon: <FileText />, download: true },
-    { title: "Progress 1 Slides", type: "Presentation", icon: <FileText />, download: true },
-    { title: "Progress 2 Slides", type: "Presentation", icon: <FileText />, download: true },
-    { title: "Final Slides", type: "Presentation", icon: <FileText />, download: true },
+    { title: "Project Charter", type: "Document", icon: <FileText />, download: true, url: "/Project Charter.pdf" },
+    { title: "Proposal Document", type: "Document", icon: <FileText />, download: true, url: "/Proposal Document.pdf" },
+    { title: "Check List Documents", type: "Checklist", icon: <FileText />, download: true, url: "/Check List Documents.pdf" },
+    { title: "Final Documentation", type: "Document", icon: <FileText />, download: true, url: "/Final Documentation.pdf" },
+    { title: "Proposal Slides", type: "Presentation", icon: <FileText />, download: true, url: "/Proposal Slides.pdf" },
+    { title: "Progress 1 Slides", type: "Presentation", icon: <FileText />, download: true, url: "#" },
+    { title: "Progress 2 Slides", type: "Presentation", icon: <FileText />, download: true, url: "#" },
+    { title: "Final Slides", type: "Presentation", icon: <FileText />, download: true, url: "#" },
   ];
 
   return (
@@ -44,10 +44,16 @@ export default function Documents() {
                 <p className="text-slate-500 text-sm mb-6">{doc.type}</p>
               </div>
               
-              <button className="flex items-center justify-between w-full text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors pt-4 border-t border-slate-100">
+              <a 
+                href={doc.url} 
+                download={doc.download ? true : undefined}
+                target={!doc.download ? "_blank" : undefined}
+                rel={!doc.download ? "noopener noreferrer" : undefined}
+                className="flex items-center justify-between w-full text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors pt-4 border-t border-slate-100"
+              >
                 <span>{doc.download ? "Download File" : "View Online"}</span>
                 {doc.download ? <Download className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
-              </button>
+              </a>
             </motion.div>
           ))}
         </div>
